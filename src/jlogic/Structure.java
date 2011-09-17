@@ -43,8 +43,12 @@ public final class Structure implements Term {
         builder.append(functor);
         builder.append('(');
 
-        for (Term argument : arguments)
-            builder.append(argument);
+        for (int i = 0; i < arguments.length; ++i) {
+            builder.append(arguments[i]);
+
+            if (i + 1 != arguments.length)
+                builder.append(',');
+        }
 
         builder.append(')');
 
