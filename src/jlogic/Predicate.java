@@ -4,6 +4,7 @@ public final class Predicate {
     private final String name;
     private final Rule[] clauses;
     private final int arity;
+    private final String fullName;
 
     public Predicate(String name, Rule[] clauses) {
         if (clauses == null || clauses.length == 0)
@@ -17,14 +18,11 @@ public final class Predicate {
         this.clauses = clauses;
 
         arity = clauses[0].getHead().getArity();
+        fullName = name + '/' + Integer.toString(arity);
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getFullName() {
-        return name + '/' + Integer.toString(arity);
     }
 
     public Rule[] getClauses() {
@@ -33,6 +31,10 @@ public final class Predicate {
 
     public int getArity() {
         return arity;
+    }
+
+    public String getFullName() {
+        return fullName;
     }
 
     private static boolean isUniformArity(Rule[] clauses) {
