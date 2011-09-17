@@ -8,12 +8,16 @@ public final class Structure implements Term {
         this.functor = functor;
         this.arguments = arguments;
     }
-    
+
     public Atom getFunctor() {
         return functor;
     }
-    
+
     public Term[] getArguments() {
         return arguments;
+    }
+
+    public int getArity() {
+        return arguments.length;
     }
 }
