@@ -7,14 +7,16 @@ public final class Frame {
 
     // Suppress warnings for the cast after clone()
     @SuppressWarnings("unchecked")
-    public Frame clone() {
-        HashMap<Variable, Term> instantiations = (HashMap<Variable, Term>)
-                this.instantiations.clone();
+    private HashMap<Variable, Term> cloneInstantiations() {
+        return (HashMap<Variable, Term>) this.instantiations.clone();
+    }
 
-        Frame result = new Frame();
-        result.instantiations = instantiations;
+    public Frame() {
 
-        return result;
+    }
+
+    public Frame(Frame other) {
+        instantiations = other.cloneInstantiations();
     }
 
     public void instantiate(Variable variable, Term term) {
