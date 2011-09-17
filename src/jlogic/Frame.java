@@ -26,9 +26,6 @@ public final class Frame {
     }
 
     public Term getInstantiation(Variable variable) {
-        Term result = instantiations.get(variable);
-        if (result == null)
-            throw new IllegalArgumentException("instantiation not found");
-        return result;
+        return instantiations.get(variable);
     }
 }
