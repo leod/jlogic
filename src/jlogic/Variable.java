@@ -12,6 +12,19 @@ public class Variable implements Term {
         this.name = name;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object)
+            return true;
+        if (object == null)
+            return false;
+        if (getClass() != object.getClass())
+            return false;
+
+        Variable other = (Variable) object;
+        return name.equals(other.name);
+    }
+
     public String getName() {
         return name;
     }
