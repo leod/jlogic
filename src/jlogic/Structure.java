@@ -37,6 +37,20 @@ public final class Structure implements Term {
         return true;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(functor);
+        builder.append('(');
+
+        for (Term argument : arguments)
+            builder.append(argument);
+
+        builder.append(')');
+
+        return builder.toString();
+    }
+
     public Atom getFunctor() {
         return functor;
     }

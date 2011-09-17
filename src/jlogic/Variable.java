@@ -30,6 +30,11 @@ public class Variable implements Term {
         return name.hashCode();
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
     public String getName() {
         return name;
     }
@@ -37,7 +42,7 @@ public class Variable implements Term {
     private static boolean isValidName(String name) {
         // TODO: Implement isValidName.
         return !name.isEmpty()
-                && (name.charAt(0) == '_' || Character.isUpperCase(name
-                        .charAt(0)));
+                && (name.charAt(0) == '_'
+                || Character.isUpperCase(name.charAt(0)));
     }
 }

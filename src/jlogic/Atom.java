@@ -25,6 +25,11 @@ public final class Atom implements Term {
         return name.equals(other.name);
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
     public String getName() {
         return name;
     }

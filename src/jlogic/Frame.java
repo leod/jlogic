@@ -28,4 +28,8 @@ public final class Frame {
     public Term getInstantiation(Variable variable) {
         return instantiations.get(variable);
     }
+
+    public String toString() {
+        return instantiations.toString();
+    }
 }
