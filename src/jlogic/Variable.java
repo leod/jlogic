@@ -25,6 +25,11 @@ public class Variable implements Term {
         return name.equals(other.name);
     }
 
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
     public String getName() {
         return name;
     }
