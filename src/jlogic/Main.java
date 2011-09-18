@@ -2,15 +2,21 @@ package jlogic;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 
-import jlogic.term.*;
-import jlogic.interpret.*;
-import jlogic.read.*;
+import jlogic.interpret.Frame;
+import jlogic.interpret.Matcher;
+import jlogic.read.Lexer;
+import jlogic.read.Parser;
+import jlogic.read.ReadException;
+import jlogic.term.Term;
 
 public final class Main {
     public static void main(String[] args) throws ReadException, IOException {
-        // String source =
+        Knowledge knowledge = readFile("test.jl");
+        System.out.println(knowledge);
+
         Term left = termFromString("a(X,X)");
         Term right = termFromString("a(Y,Y)");
 
@@ -38,8 +44,16 @@ public final class Main {
         return parser.parseTerm();
     }
 
-    private static String readFile(String path) throws IOException {
-        // FileInputStream stream = new FileInputStream(new File(path));
-        return null;
+    private static Knowledge readFile(String path) throws ReadException, IOException {
+        FileInputStream stream = null;
+        try {
+            stream = new FileInputStream("test.jl");
+            Lexer lexer = new Lexer(path, new InputStreamReader(stream));
+            Parser parser = new Parser(lexer);
+            return parser.parseKnowledge();
+        } finally {
+            if (stream != null)
+                stream.close();
+        }
     }
 }
