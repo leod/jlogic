@@ -1,15 +1,17 @@
 package jlogic;
 
 import jlogic.term.*;
+import jlogic.interpret.*;
 import jlogic.read.*;
 
 public final class Main {
     public static void main(String[] args) throws ReadException {
-        Term left = termFromString("succ(X)");
-        Term right = termFromString("X");
+        Term left = termFromString("_");
+        Term right = termFromString("_");
 
         System.out.println(left);
         System.out.println(right);
+        System.out.println("--------------");
 
         Frame frame = new Frame();
         System.out.println(Matcher.match(frame, left, right));

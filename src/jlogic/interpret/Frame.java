@@ -1,9 +1,9 @@
-package jlogic;
+package jlogic.interpret;
 
 import java.util.HashMap;
 
-import jlogic.term.Term;
-import jlogic.term.Variable;
+import jlogic.term.*;
+import jlogic.term.*;
 
 public final class Frame {
     private HashMap<Variable, Term> instantiations = new HashMap<Variable, Term>();

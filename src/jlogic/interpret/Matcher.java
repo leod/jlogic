@@ -1,4 +1,4 @@
-package jlogic;
+package jlogic.interpret;
 
 import jlogic.term.*;
 
@@ -28,6 +28,10 @@ public final class Matcher {
             return matchVariable(frame, (Variable) a, b);
         if (b instanceof Variable)
             return matchVariable(frame, (Variable) b, a);
+        if (a instanceof AnonymousVariable)
+            return frame;
+        if (b instanceof AnonymousVariable)
+            return frame;
 
         return null;
     }

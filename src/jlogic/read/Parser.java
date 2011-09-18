@@ -46,6 +46,8 @@ public final class Parser {
                         return atom;
                     }
                 }
+            case Underscore:
+                return new AnonymousVariable();
             default:
                 throw new ReadException(current.getLocation(), "Expected term");
         }
