@@ -5,7 +5,6 @@ import jlogic.term.Structure;
 import jlogic.term.Term;
 import jlogic.term.Variable;
 
-
 public final class Matcher {
     // Static class
     private Matcher() {
@@ -14,7 +13,7 @@ public final class Matcher {
 
     /**
      * Try to match two terms, instantiating variables as needed.
-     *
+     * 
      * @param frame
      *        A frame containing pre-existing instantiations. This frame is not
      *        modified.

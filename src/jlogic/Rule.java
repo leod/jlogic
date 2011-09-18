@@ -3,7 +3,6 @@ package jlogic;
 import jlogic.term.Structure;
 import jlogic.term.Term;
 
-
 public final class Rule {
     private final Structure head;
     private final Term[] body;
@@ -18,6 +17,24 @@ public final class Rule {
 
     public Rule(Structure head) {
         this(head, null);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(head);
+        builder.append(" :- ");
+
+        for (int i = 0; i < body.length; ++i) {
+            builder.append(body[i]);
+
+            if (i + 1 != body.length)
+                builder.append(", ");
+        }
+
+        builder.append(".");
+
+        return builder.toString();
     }
 
     public boolean isFact() {
