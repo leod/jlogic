@@ -1,10 +1,15 @@
 package jlogic.read;
 
-import java.util.ArrayList;
 import java.io.IOException;
+import java.util.ArrayList;
 
-import jlogic.*;
-import jlogic.term.*;
+import jlogic.Knowledge;
+import jlogic.Rule;
+import jlogic.term.AnonymousVariable;
+import jlogic.term.Atom;
+import jlogic.term.Structure;
+import jlogic.term.Term;
+import jlogic.term.Variable;
 
 public final class Parser {
     private final Lexer lexer;
@@ -112,7 +117,7 @@ public final class Parser {
             rules.add(parseRule());
 
         Rule[] ruleArray = new Rule[rules.size()];
-        return new Knowledge(ruleArray);
+        return new Knowledge(rules.toArray(ruleArray));
     }
 
     private void advance() throws ReadException, IOException {
