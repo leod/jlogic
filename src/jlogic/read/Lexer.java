@@ -82,7 +82,7 @@ public final class Lexer {
     }
 
     private void skipWhitespace() {
-        while (Character.isWhitespace(current)) {
+        while (!isEndOfFile() && Character.isWhitespace(current)) {
             if (current == '\n') {
                 advance();
                 column = 0;
