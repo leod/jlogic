@@ -67,7 +67,11 @@ public final class Structure implements Term {
         return arguments.length;
     }
 
+    public String getName() {
+        return functor.getName();
+    }
+
     public String getFullName() {
-        return functor.getName() + '/' + getArity();
+        return getName() + '/' + getArity();
     }
 }
