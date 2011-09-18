@@ -1,18 +1,32 @@
 package jlogic;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class Knowledge {
-    private HashMap<String, Predicate> predicates = new HashMap<String, Predicate>();
+    private final HashMap<String, Predicate> predicates = new HashMap<String, Predicate>();
 
     public Knowledge(Rule[] rules) {
         HashMap<String, ArrayList<Rule>> rulesByName = groupRules(rules);
 
         for (Map.Entry<String, ArrayList<Rule>> entry : rulesByName.entrySet()) {
-            predicates.put(entry.getKey(), new Predicate((Rule[]) entry.getValue().toArray()));
+            Rule[] ruleArray = new Rule[entry.getValue().size()];
+            predicates.put(entry.getKey(), new Predicate(entry.getValue().toArray(ruleArray)));
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        for (Map.Entry<String, Predicate> entry : predicates.entrySet()) {
+            builder.append(entry.getKey());
+            builder.append(":\n");
+            builder.append(entry.getValue());
+        }
+
+        return builder.toString();
     }
 
     public Predicate getPredicate(String fullName) {
@@ -27,6 +41,8 @@ public final class Knowledge {
         HashMap<String, ArrayList<Rule>> result = new HashMap<String, ArrayList<Rule>>();
 
         for (Rule rule : rules) {
+            assert rule != null;
+
             ArrayList<Rule> list = result.get(rule.getHead().getFullName());
             if (list == null) {
                 list = new ArrayList<Rule>();
