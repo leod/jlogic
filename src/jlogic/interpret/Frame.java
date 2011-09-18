@@ -3,7 +3,6 @@ package jlogic.interpret;
 import java.util.HashMap;
 
 import jlogic.term.*;
-import jlogic.term.*;
 
 public final class Frame {
     private HashMap<Variable, Term> instantiations = new HashMap<Variable, Term>();
@@ -16,6 +15,11 @@ public final class Frame {
 
     public Frame() {
 
+    }
+
+    @Override
+    public String toString() {
+        return instantiations.toString();
     }
 
     public Frame(Frame other) {
@@ -32,9 +36,5 @@ public final class Frame {
 
     public Term getInstantiation(Variable variable) {
         return instantiations.get(variable);
-    }
-
-    public String toString() {
-        return instantiations.toString();
     }
 }

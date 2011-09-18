@@ -1,6 +1,10 @@
 package jlogic.interpret;
 
-import jlogic.term.*;
+import jlogic.term.AnonymousVariable;
+import jlogic.term.Atom;
+import jlogic.term.Structure;
+import jlogic.term.Term;
+import jlogic.term.Variable;
 
 public final class Matcher {
     // Static class
@@ -19,6 +23,11 @@ public final class Matcher {
      * @return Either a new frame or null, if the match was unsuccessful.
      */
     public static Frame match(Frame frame, Term a, Term b) {
+        System.out.println("Match " + a + " and " + b + " in frame " + frame);
+
+        if (a.equals(b))
+            return frame;
+
         // Emulate double dispatch
         if (a instanceof Atom && b instanceof Atom)
             return matchAtoms(frame, (Atom) a, (Atom) b);
@@ -43,7 +52,7 @@ public final class Matcher {
     private static Frame matchVariable(Frame frame, Variable variable, Term term) {
         Term instantiation = frame.getInstantiation(variable);
         if (instantiation != null)
-            return instantiation.equals(term) ? frame : null;
+            return match(frame, instantiation, term);
 
         Frame newFrame = new Frame(frame);
         newFrame.instantiate(variable, term);
