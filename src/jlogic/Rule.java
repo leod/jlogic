@@ -23,13 +23,16 @@ public final class Rule {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(head);
-        builder.append(" :- ");
 
-        for (int i = 0; i < body.length; ++i) {
-            builder.append(body[i]);
+        if (body != null) {
+            builder.append(" :- ");
 
-            if (i + 1 != body.length)
-                builder.append(", ");
+            for (int i = 0; i < body.length; ++i) {
+                builder.append(body[i]);
+
+                if (i + 1 != body.length)
+                    builder.append(", ");
+            }
         }
 
         builder.append(".");
