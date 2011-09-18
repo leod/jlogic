@@ -22,6 +22,8 @@ public final class Lexer {
     }
 
     public Token read() throws ReadException {
+        assert codeIndex >= 0 && codeIndex <= code.length();
+
         if (codeIndex == code.length())
             return new Token(createLocation(), TokenType.EndOfFile, "");
 
@@ -54,8 +56,12 @@ public final class Lexer {
         ++codeIndex;
         ++column;
 
-        if (codeIndex < code.length())
+        if (!isEndOfFile())
             current = code.charAt(codeIndex);
+    }
+
+    private boolean isEndOfFile() {
+        return codeIndex == code.length();
     }
 
     private Location createLocation() {
@@ -66,8 +72,9 @@ public final class Lexer {
         Location location = createLocation();
 
         int start = codeIndex;
-        while (Character.isLetter(current) || Character.isDigit(current) ||
-                current == '_') {
+        while (!isEndOfFile() &&
+                (Character.isLetter(current) || Character.isDigit(current) ||
+                current == '_')) {
             advance();
         }
 
