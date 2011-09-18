@@ -1,5 +1,11 @@
 package jlogic;
 
+import jlogic.term.Atom;
+import jlogic.term.Structure;
+import jlogic.term.Term;
+import jlogic.term.Variable;
+
+
 public final class Main {
     public static void main(String[] args) {
         Frame frame = new Frame();

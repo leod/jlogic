@@ -1,5 +1,9 @@
 package jlogic;
 
+import jlogic.term.Structure;
+import jlogic.term.Term;
+
+
 public final class Rule {
     private final Structure head;
     private final Term[] body;

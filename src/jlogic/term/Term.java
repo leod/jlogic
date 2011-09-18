@@ -1,4 +1,4 @@
-package jlogic;
+package jlogic.term;
 
 public interface Term {
 

@@ -1,4 +1,4 @@
-package jlogic;
+package jlogic.term;
 
 public final class Structure implements Term {
     private final Atom functor;

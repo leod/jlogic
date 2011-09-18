@@ -1,4 +1,4 @@
-package jlogic;
+package jlogic.term;
 
 public final class AnonymousVariable implements Term {
     @Override

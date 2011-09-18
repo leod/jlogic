@@ -1,4 +1,4 @@
-package jlogic;
+package jlogic.term;
 
 public class Variable implements Term {
     private final String name;

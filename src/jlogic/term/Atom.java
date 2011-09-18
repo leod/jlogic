@@ -1,4 +1,4 @@
-package jlogic;
+package jlogic.term;
 
 public final class Atom implements Term {
     private final String name;
