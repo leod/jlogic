@@ -5,8 +5,8 @@ import jlogic.read.*;
 
 public final class Main {
     public static void main(String[] args) throws ReadException {
-        Term left = termFromString("numeral(succ(X))");
-        Term right = termFromString("numeral(succ(succ(succ(X))))");
+        Term left = termFromString("succ(X)");
+        Term right = termFromString("X");
 
         System.out.println(left);
         System.out.println(right);

@@ -1,9 +1,6 @@
 package jlogic;
 
-import jlogic.term.Atom;
-import jlogic.term.Structure;
-import jlogic.term.Term;
-import jlogic.term.Variable;
+import jlogic.term.*;
 
 public final class Matcher {
     // Static class

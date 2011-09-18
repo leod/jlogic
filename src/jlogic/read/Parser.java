@@ -46,9 +46,9 @@ public final class Parser {
                         return atom;
                     }
                 }
+            default:
+                throw new ReadException(current.getLocation(), "Expected term");
         }
-
-        throw new ReadException(current.getLocation(), "Expected term");
     }
 
     public Atom parseAtom() throws ReadException {
