@@ -1,13 +1,18 @@
 package jlogic;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.StringReader;
+
 import jlogic.term.*;
 import jlogic.interpret.*;
 import jlogic.read.*;
 
 public final class Main {
-    public static void main(String[] args) throws ReadException {
-        Term left = termFromString("_");
-        Term right = termFromString("_");
+    public static void main(String[] args) throws ReadException, IOException {
+        // String source =
+        Term left = termFromString("a(X,X)");
+        Term right = termFromString("a(Y,Y)");
 
         System.out.println(left);
         System.out.println(right);
@@ -17,9 +22,9 @@ public final class Main {
         System.out.println(Matcher.match(frame, left, right));
     }
 
-    private static Term termFromString(String string) throws ReadException {
+    private static Term termFromString(String string) throws ReadException, IOException {
         final String file = "[main" + string.hashCode() + "]";
-        Lexer lexer = new Lexer(file, string);
+        Lexer lexer = new Lexer(file, new StringReader(string));
 
         /*
          * Token token; do { token = lexer.read(); System.out.println(token); }
@@ -31,5 +36,10 @@ public final class Main {
         Parser parser = new Parser(lexer);
 
         return parser.parseTerm();
+    }
+
+    private static String readFile(String path) throws IOException {
+        // FileInputStream stream = new FileInputStream(new File(path));
+        return null;
     }
 }

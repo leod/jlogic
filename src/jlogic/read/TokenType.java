@@ -5,6 +5,10 @@ public enum TokenType {
     RightParen,
     Comma,
     Underscore,
+    Colon,
+    Hyphen,
+    Period,
+
     Identifier,
     EndOfFile
 }

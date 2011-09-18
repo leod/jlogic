@@ -1,30 +1,33 @@
 package jlogic.read;
 
+import java.io.Reader;
+import java.io.IOException;
+
 public final class Lexer {
     private String file;
     private int line = 0;
     private int column = 0;
 
-    private String code;
+    private Reader code;
     private char current;
-    private int codeIndex = 0;
+    private boolean endOfFile = false;
 
-    public Lexer(String file, String code) {
+    public Lexer(String file, Reader code) throws IOException {
         this.file = file;
         this.code = code;
 
-        if (code.length() > 0)
-            current = code.charAt(0);
+        int input = code.read();
+        if (input == -1)
+            endOfFile = true;
+        current = (char) input;
     }
 
     public String getFile() {
         return file;
     }
 
-    public Token read() throws ReadException {
-        assert codeIndex >= 0 && codeIndex <= code.length();
-
-        if (codeIndex == code.length())
+    public Token read() throws ReadException, IOException {
+        if (endOfFile)
             return new Token(createLocation(), TokenType.EndOfFile, "");
 
         Token token = null;
@@ -42,6 +45,15 @@ public final class Lexer {
         } else if (current == ',') {
             token = new Token(createLocation(), TokenType.Comma, ",");
             advance();
+        } else if (current == ':') {
+            token = new Token(createLocation(), TokenType.Colon, ":");
+            advance();
+        } else if (current == '-') {
+            token = new Token(createLocation(), TokenType.Hyphen, "-");
+            advance();
+        } else if (current == '.') {
+            token = new Token(createLocation(), TokenType.Period, ".");
+            advance();
         }
 
         if (token == null)
@@ -52,37 +64,38 @@ public final class Lexer {
         return token;
     }
 
-    private void advance() {
-        ++codeIndex;
+    private void advance() throws IOException {
         ++column;
 
-        if (!isEndOfFile())
-            current = code.charAt(codeIndex);
-    }
+        int input = code.read();
+        if (input == -1) {
+            endOfFile = true;
+            return;
+        }
 
-    private boolean isEndOfFile() {
-        return codeIndex == code.length();
+        current = (char) input;
     }
 
     private Location createLocation() {
         return new Location(file, line, column);
     }
 
-    private Token readIdentifier() {
+    private Token readIdentifier() throws IOException {
         Location location = createLocation();
 
-        int start = codeIndex;
-        while (!isEndOfFile() &&
+        StringBuilder stringBuilder = new StringBuilder();
+        while (!endOfFile &&
                 (Character.isLetter(current) || Character.isDigit(current) ||
                 current == '_')) {
+            stringBuilder.append(current);
             advance();
         }
 
-        return new Token(location, TokenType.Identifier, code.substring(start, codeIndex));
+        return new Token(location, TokenType.Identifier, stringBuilder.toString());
     }
 
-    private void skipWhitespace() {
-        while (!isEndOfFile() && Character.isWhitespace(current)) {
+    private void skipWhitespace() throws IOException {
+        while (!endOfFile && Character.isWhitespace(current)) {
             if (current == '\n') {
                 advance();
                 column = 0;
