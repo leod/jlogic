@@ -19,6 +19,18 @@ public final class Predicate {
         arity = clauses[0].getHead().getArity();
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        for (Rule clause : clauses) {
+            builder.append(clause);
+            builder.append("\n");
+        }
+
+        return builder.toString();
+    }
+
     public String getName() {
         return name;
     }
