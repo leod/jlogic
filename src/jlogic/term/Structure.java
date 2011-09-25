@@ -55,6 +55,11 @@ public final class Structure implements Term {
         return builder.toString();
     }
 
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     public Atom getFunctor() {
         return functor;
     }

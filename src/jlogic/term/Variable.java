@@ -35,6 +35,11 @@ public class Variable implements Term {
         return name;
     }
 
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     public String getName() {
         return name;
     }

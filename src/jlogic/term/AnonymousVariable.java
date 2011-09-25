@@ -17,4 +17,9 @@ public final class AnonymousVariable implements Term {
     public String toString() {
         return "_";
     }
+
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

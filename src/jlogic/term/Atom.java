@@ -30,6 +30,11 @@ public final class Atom implements Term {
         return name;
     }
 
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     public String getName() {
         return name;
     }
