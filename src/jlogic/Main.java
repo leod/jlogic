@@ -6,26 +6,42 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 
 import jlogic.interpret.Frame;
-import jlogic.interpret.Matcher;
+import jlogic.interpret.SearchTree;
 import jlogic.read.Lexer;
 import jlogic.read.Parser;
 import jlogic.read.ReadException;
+import jlogic.term.Structure;
 import jlogic.term.Term;
 
 public final class Main {
     public static void main(String[] args) throws ReadException, IOException {
+        // Term left = termFromString("a(X,X)");
+        // Term right = termFromString("a(Y,Y)");
+
+        // System.out.println(left);
+        // System.out.println(right);
+        // System.out.println("--------------");
+
+        // Frame frame = new Frame();
+        // System.out.println(Matcher.match(frame, left, right));
+
         Knowledge knowledge = readFile("test.jl");
+        Structure query = (Structure) termFromString("descend(martha,laura)");
+
         System.out.println(knowledge);
+        System.out.println(query);
 
-        Term left = termFromString("a(X,X)");
-        Term right = termFromString("a(Y,Y)");
+        SearchTree search = new SearchTree(knowledge, query);
 
-        System.out.println(left);
-        System.out.println(right);
-        System.out.println("--------------");
+        Frame frame;
+        do {
+            frame = search.searchOne();
+            if (frame != null) {
+                System.out.println("Match!");
+            }
+        } while (frame != null);
 
-        Frame frame = new Frame();
-        System.out.println(Matcher.match(frame, left, right));
+        System.out.println(search.toDOT());
     }
 
     private static Term termFromString(String string) throws ReadException, IOException {
