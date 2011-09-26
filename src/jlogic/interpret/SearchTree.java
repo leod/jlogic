@@ -338,6 +338,8 @@ public final class SearchTree {
 
             if (goals.isEmpty())
                 builder.append(" color=green");
+            else if (children.isEmpty())
+                builder.append(" color=red");
 
             builder.append("];\n");
 
