@@ -194,7 +194,7 @@ public final class SearchTree {
 
                     clauseBody = internalizer.visit(clauseBody);
 
-                    List<Term> childGoals = goals.tail().append(clauseBody);
+                    List<Term> childGoals = clauseBody.append(goals.tail());
                     childGoals = instantiator.visit(childGoals);
 
                     Node childNode = new Node(this, matchFrame, childGoals);
