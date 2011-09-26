@@ -2,7 +2,8 @@ package jlogic.interpret;
 
 import java.util.HashMap;
 
-import jlogic.term.*;
+import jlogic.term.Term;
+import jlogic.term.Variable;
 
 public final class Frame {
     private HashMap<Variable, Term> instantiations = new HashMap<Variable, Term>();
@@ -36,5 +37,9 @@ public final class Frame {
 
     public Term getInstantiation(Variable variable) {
         return instantiations.get(variable);
+    }
+
+    public HashMap<Variable, Term> getInstantiations() {
+        return instantiations;
     }
 }

@@ -6,6 +6,7 @@ import jlogic.term.Structure;
 import jlogic.term.Term;
 import jlogic.term.Variable;
 import jlogic.term.Visitor;
+
 import fj.F;
 import fj.data.List;
 
@@ -40,7 +41,7 @@ public final class Instantiator implements Visitor<Term> {
     public Term visit(Variable variable) {
         Term instantiation = instantiations.getInstantiation(variable);
         if (instantiation != null)
-            return instantiation;
+            return instantiation.accept(this);
         return variable;
     }
 

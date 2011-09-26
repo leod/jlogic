@@ -29,8 +29,8 @@ public final class Main {
         Knowledge knowledge = readFile("test.jl");
         Structure query = (Structure) termFromString("add(succ(succ(succ(zero))), succ(succ(zero)), R)");
 
-        System.out.println(knowledge);
-        System.out.println(query);
+        // System.out.println(knowledge);
+        // System.out.println(query);
 
         SearchTree search = new SearchTree(knowledge, query);
 
@@ -38,8 +38,13 @@ public final class Main {
         do {
             frame = search.searchOne();
             if (frame != null) {
-                System.out.println("Match!");
+                if (frame.getInstantiations().size() > 0)
+                    System.out.println(frame);
+                else
+                    System.out.println("Yes.");
             }
+            else
+                System.out.println("No.");
         } while (frame != null);
 
         createGraphImage("searchgraph.png", search.toDOT());

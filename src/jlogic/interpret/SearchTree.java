@@ -1,10 +1,13 @@
 package jlogic.interpret;
 
+import java.util.Map;
+
 import jlogic.Knowledge;
 import jlogic.Predicate;
 import jlogic.Rule;
 import jlogic.term.Structure;
 import jlogic.term.Term;
+import jlogic.term.Variable;
 
 import fj.F2;
 import fj.data.List;
@@ -20,6 +23,7 @@ public final class SearchTree {
     private final Knowledge knowledge;
     private final InternalVariableFactory internalVariableFactory;
     private final Node root;
+    private final Frame queryFrame;
 
     private Node current;
     private Frame result;
@@ -28,8 +32,9 @@ public final class SearchTree {
         this.knowledge = knowledge;
         internalVariableFactory = new InternalVariableFactory();
 
+        queryFrame = new Frame();
         FreeVariablesInternalizer internalizer =
-                new FreeVariablesInternalizer(internalVariableFactory, new Frame());
+                new FreeVariablesInternalizer(internalVariableFactory, queryFrame);
         query = (Structure) internalizer.visit(query);
 
         root = current = new Node(null, new Frame(), List.single((Term) query));
@@ -39,7 +44,16 @@ public final class SearchTree {
         result = null;
         while (current != null && result == null)
             current.searchOne();
-        return result;
+
+        if (result != null) {
+            Frame frame = new Frame();
+            Instantiator instantiator = new Instantiator(result);
+            for (Map.Entry<Variable, Term> entry : queryFrame.getInstantiations().entrySet()) {
+                frame.instantiate(entry.getKey(), result.getInstantiation((Variable) entry.getValue()).accept(instantiator));
+            }
+            return frame;
+        } else
+            return null;
     }
 
     // Used to generate node names in Node.toDOT
@@ -71,7 +85,7 @@ public final class SearchTree {
     private Predicate getPredicate(Term term) {
         if (term instanceof Structure) {
             Structure structure = (Structure) term;
-            System.out.println("Looking up " + structure.getFullName());
+            // System.out.println("Looking up " + structure.getFullName());
             return knowledge.getPredicate(structure.getFullName());
         }
         assert false; // TODO
@@ -86,8 +100,6 @@ public final class SearchTree {
             }
         }, "");
     }
-
-    static int test = 0;
 
     private final class Node {
         private final Node parent;
@@ -121,24 +133,19 @@ public final class SearchTree {
             this.goalPredicate = goal != null ? getPredicate(this.goal) : null;
             this.numClauses = this.goalPredicate != null ? this.goalPredicate.getClauses().length : 0;
 
-            System.out.println("New Node with clauses " + clausesToString(goals) + " and frame " + frame);
+            // System.out.println("New Node with clauses " +
+            // clausesToString(goals) + " and frame " + frame);
         }
 
         public void searchOne() {
-            if (++test == 20) {
-                current = null;
-                result = null;
-                return;
-            }
-
             if (goals.isEmpty()) {
-                System.out.println("Reached empty node");
+                // System.out.println("Reached empty node");
 
                 // An empty goal list means that we have found a valid result.
                 // Hand control to our parent and return our frame of variable
                 // instantiations.
                 current = parent;
-                result = new Frame(); // TODO: Hack
+                result = frame;
                 return;
             }
 
@@ -162,19 +169,22 @@ public final class SearchTree {
                                 augmentedFrame);
                 Instantiator instantiator = new Instantiator(augmentedFrame);
                 List<Term> clauseBody = getTerms(clause);
-                System.out.println("Before: " + clause.getHead() + " :- " + clausesToString(clauseBody));
+                // System.out.println("Before: " + clause.getHead() + " :- " +
+                // clausesToString(clauseBody));
                 Term clauseHead = clause.getHead().accept(internalizer);
                 clauseBody = instantiator.visit(clauseBody);
-                System.out.println("After: " + clauseHead + " :- " + clausesToString(clauseBody));
+                // System.out.println("After: " + clauseHead + " :- " +
+                // clausesToString(clauseBody));
 
-                System.out.println("Matching: " + goal + " vs. " + clauseHead + " with " + frame);
+                // System.out.println("Matching: " + goal + " vs. " + clauseHead
+                // + " with " + frame);
                 matchFrame = Matcher.match(frame, goal, clauseHead);
 
                 // Create a new child with the first clause in our predicate
                 // that matches
                 if (matchFrame != null) {
                     matchFrame = new Frame(matchFrame);
-                    System.out.println("Matched in " + matchFrame);
+                    // System.out.println("Matched in " + matchFrame);
 
                     // Instantiate the clause's body with known variables,
                     // then replace all remaining free variables by internal
@@ -214,8 +224,8 @@ public final class SearchTree {
 
             if (!goals.isEmpty()) // Remove last comma and newline if existing
                 builder.delete(builder.length() - 3, builder.length());
-            else
-                builder.append(frame);
+            // else
+            // builder.append(frame);
 
             builder.append("\"];\n");
 
