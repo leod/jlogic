@@ -23,9 +23,7 @@ public final class Match {
      * @return Either a new frame or null, if the match was unsuccessful.
      */
     public static Frame match(Frame frame, Term a, Term b) {
-        // System.out.println("Match " + a + " and " + b + " in frame " +
-        // frame);
-
+        // TODO: Is this still needed?
         if (a.equals(b))
             return frame;
 
