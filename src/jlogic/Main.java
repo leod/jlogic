@@ -3,6 +3,7 @@ package jlogic;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.StringReader;
 
 import jlogic.interpret.Frame;
@@ -14,7 +15,7 @@ import jlogic.term.Structure;
 import jlogic.term.Term;
 
 public final class Main {
-    public static void main(String[] args) throws ReadException, IOException {
+    public static void main(String[] args) throws ReadException, IOException, InterruptedException {
         // Term left = termFromString("a(X,X)");
         // Term right = termFromString("a(Y,Y)");
 
@@ -41,7 +42,7 @@ public final class Main {
             }
         } while (frame != null);
 
-        System.out.println(search.toDOT());
+        createGraphImage("searchgraph.png", search.toDOT());
     }
 
     private static Term termFromString(String string) throws ReadException, IOException {
@@ -71,5 +72,20 @@ public final class Main {
             if (stream != null)
                 stream.close();
         }
+    }
+
+    private static void createGraphImage(String filename, String dot) throws IOException, InterruptedException {
+        // This might not always work, see
+        // <http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html?page=4>.
+
+        Process process = Runtime.getRuntime().exec("dot -o" + filename + " -Tpng");
+        OutputStream stdin = process.getOutputStream();
+        stdin.write(dot.getBytes());
+        stdin.flush();
+        stdin.close();
+        process.waitFor();
+
+        if (process.exitValue() != 0)
+            throw new IOException("dot returned " + process.exitValue());
     }
 }

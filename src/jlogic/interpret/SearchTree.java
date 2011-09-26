@@ -38,6 +38,7 @@ public final class SearchTree {
         return result;
     }
 
+    // Used to generate node names in Node.toDOT
     private int idCounter = 0;
 
     public String toDOT() {
@@ -166,7 +167,7 @@ public final class SearchTree {
 
             for (Term goal : goals) {
                 builder.append(goal);
-                builder.append("\n, ");
+                builder.append(",\\n");
             }
 
             if (!goals.isEmpty()) // Remove last comma and newline if existing
