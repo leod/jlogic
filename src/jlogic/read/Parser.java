@@ -34,35 +34,42 @@ public final class Parser {
                     Atom atom = parseAtom();
 
                     if (current.getType() == TokenType.LeftParen) {
-                        advance();
-
-                        ArrayList<Term> arguments = new ArrayList<Term>();
-
-                        while (current.getType() != TokenType.RightParen) {
-                            if (current.getType() == TokenType.EndOfFile)
-                                throw new ReadException(current.getLocation(),
-                                        "Unexpected end of file in parameter list");
-
-                            arguments.add(parseTerm());
-                            if (current.getType() == TokenType.Comma)
-                                advance();
-                            // TODO: This allows trailing commas
-                        }
-
-                        advance();
-
-                        Term[] argumentArray = new Term[arguments.size()];
-                        return new Structure(atom,
-                                arguments.toArray(argumentArray));
-                    } else {
-                        return atom;
+                        Term[] arguments = parseArguments();
+                        return new Structure(atom, arguments);
                     }
+                    else
+                        return atom;
                 }
             case Underscore:
+                advance();
                 return new AnonymousVariable();
             default:
                 throw new ReadException(current.getLocation(), "Expected term");
         }
+    }
+
+    public Term[] parseArguments() throws ReadException, IOException {
+        assert current.getType() == TokenType.LeftParen;
+
+        advance();
+
+        ArrayList<Term> arguments = new ArrayList<Term>();
+
+        while (current.getType() != TokenType.RightParen) {
+            if (current.getType() == TokenType.EndOfFile)
+                throw new ReadException(current.getLocation(),
+                        "Unexpected end of file in parameter list");
+
+            arguments.add(parseTerm());
+            if (current.getType() == TokenType.Comma)
+                advance();
+            // TODO: This allows trailing commas
+        }
+
+        advance();
+
+        Term[] argumentArray = new Term[arguments.size()];
+        return arguments.toArray(argumentArray);
     }
 
     public Atom parseAtom() throws ReadException, IOException {
