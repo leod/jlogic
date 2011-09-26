@@ -48,8 +48,8 @@ public final class SearchTree {
         // To prevent conflicts, first replace all free variables in the query
         // by internal variables. These instantiations are kept in `queryFrame'.
         queryFrame = new Frame();
-        FreeVariablesInternalizer internalizer =
-                new FreeVariablesInternalizer(internalVariableFactory, queryFrame);
+        InternalizeFreeVariables internalizer =
+                new InternalizeFreeVariables(internalVariableFactory, queryFrame);
         query = (Structure) internalizer.visit(query);
 
         root = current = new Node(null, new Frame(), List.single((Term) query));
@@ -73,11 +73,11 @@ public final class SearchTree {
     private Frame createResultFrame(Frame frame) {
         Frame result = new Frame();
 
-        Instantiator instantiator = new Instantiator(frame);
+        Instantiate instantiate = new Instantiate(frame);
         for (Map.Entry<Variable, Term> entry : queryFrame.getInstantiations().
                 entrySet()) {
             Term term = frame.getInstantiation((Variable) entry.getValue());
-            Term instantiatedTerm = term.accept(instantiator);
+            Term instantiatedTerm = term.accept(instantiate);
 
             result.instantiate(entry.getKey(), instantiatedTerm);
         }
@@ -120,6 +120,8 @@ public final class SearchTree {
         throw new AssertionError(term.toString());
     }
 
+    // Useful in debugging as there's no List.toString
+    @SuppressWarnings("unused")
     private String clausesToString(List<Term> clauses) {
         return clauses.foldLeft(new F2<String, Term, String>() {
             @Override
@@ -193,17 +195,17 @@ public final class SearchTree {
                 // Replace all free variables in the clause's arguments and body
                 // by internal variables before matching
                 Frame augmentedFrame = new Frame(frame);
-                FreeVariablesInternalizer internalizer =
-                        new FreeVariablesInternalizer(internalVariableFactory,
+                InternalizeFreeVariables internalizer =
+                        new InternalizeFreeVariables(internalVariableFactory,
                                 augmentedFrame);
-                Instantiator instantiator = new Instantiator(augmentedFrame);
+                Instantiate instantiate = new Instantiate(augmentedFrame);
 
                 Term clauseHead = clause.getHead().accept(internalizer);
-                List<Term> clauseBody = instantiator.visit(getTerms(clause));
+                List<Term> clauseBody = instantiate.visit(getTerms(clause));
 
                 // System.out.println("Matching: " + goal + " vs. " + clauseHead
                 // + " with " + frame);
-                matchFrame = Matcher.match(frame, goal, clauseHead);
+                matchFrame = Match.match(frame, goal, clauseHead);
 
                 // Create a new child with the first clause in our predicate
                 // that matches
@@ -214,13 +216,13 @@ public final class SearchTree {
                     // Instantiate the new goal list with known variables,
                     // then replace all remaining free variables by internal
                     // variables
-                    instantiator = new Instantiator(matchFrame);
-                    internalizer = new FreeVariablesInternalizer(internalVariableFactory, new Frame(matchFrame));
+                    instantiate = new Instantiate(matchFrame);
+                    internalizer = new InternalizeFreeVariables(internalVariableFactory, new Frame(matchFrame));
 
                     clauseBody = internalizer.visit(clauseBody);
 
                     List<Term> childGoals = clauseBody.append(goals.tail());
-                    childGoals = instantiator.visit(childGoals);
+                    childGoals = instantiate.visit(childGoals);
 
                     Node childNode = new Node(this, matchFrame, childGoals);
                     children = children.cons(childNode);
@@ -246,7 +248,7 @@ public final class SearchTree {
             for (Map.Entry<Variable, Term> entry : frame.getInstantiations().entrySet()) {
                 Term parentTerm = parent.frame.getInstantiation(entry.getKey());
                 if (parentTerm == null || !parentTerm.equals(entry.getValue())) {
-                    entry.setValue(entry.getValue().accept(new Instantiator(frame)));
+                    entry.setValue(entry.getValue().accept(new Instantiate(frame)));
                     delta = delta.cons(entry);
                 }
             }

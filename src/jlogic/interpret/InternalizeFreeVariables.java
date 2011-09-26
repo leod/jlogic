@@ -10,11 +10,21 @@ import jlogic.term.Visitor;
 import fj.F;
 import fj.data.List;
 
-public final class Instantiator implements Visitor<Term> {
-    private Frame instantiations;
+/**
+ * This class searches for free variables (e.g. X in foo(X)) in a term and
+ * instantiates them by internal variables (e.g. foo(_G1)).
+ */
+public final class InternalizeFreeVariables implements Visitor<Term> {
+    // TODO: Code duplication with Instantiator
 
-    public Instantiator(Frame instantiations) {
-        this.instantiations = instantiations;
+    private final InternalVariableFactory internalVariableFactory;
+    private Frame frame;
+
+    public InternalizeFreeVariables(
+            InternalVariableFactory internalVariableFactory,
+            Frame frame) {
+        this.internalVariableFactory = internalVariableFactory;
+        this.frame = frame;
     }
 
     @Override
@@ -39,9 +49,15 @@ public final class Instantiator implements Visitor<Term> {
 
     @Override
     public Term visit(Variable variable) {
-        Term instantiation = instantiations.getInstantiation(variable);
-        if (instantiation != null)
-            return instantiation.accept(this);
+        if (!variable.getName().startsWith("_G") /* HACK! */) {
+            Term instantiation = frame.getInstantiation(variable);
+            if (instantiation == null) {
+                Variable internalVariable = internalVariableFactory.create();
+                frame.instantiate(variable, internalVariable);
+                return internalVariable;
+            }
+            return instantiation;
+        }
         return variable;
     }
 
@@ -49,7 +65,7 @@ public final class Instantiator implements Visitor<Term> {
         return terms.map(new F<Term, Term>() {
             @Override
             public Term f(Term term) {
-                return term.accept(Instantiator.this);
+                return term.accept(InternalizeFreeVariables.this);
             }
         });
     }

@@ -6,9 +6,9 @@ import jlogic.term.Structure;
 import jlogic.term.Term;
 import jlogic.term.Variable;
 
-public final class Matcher {
+public final class Match {
     // Static class
-    private Matcher() {
+    private Match() {
         assert false;
     }
 
