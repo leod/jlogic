@@ -27,10 +27,14 @@ public final class Main {
         // System.out.println(Matcher.match(frame, left, right));
 
         Knowledge knowledge = readFile("test.jl");
-        Structure query = (Structure) termFromString("sum(cons(succ(zero), cons(succ(succ(zero)), cons(succ(succ(succ(succ(zero)))), nil))), R)");
+        // Structure query = (Structure)
+        // termFromString("sum(cons(succ(zero), cons(succ(succ(zero)), cons(succ(succ(succ(succ(zero)))), nil))), R)");
+        // Structure query = (Structure)
+        // termFromString("add(succ(succ(succ(zero))), succ(succ(zero)), R)");
+        Structure query = (Structure) termFromString("p(X)");
 
         // System.out.println(knowledge);
-        System.out.println(query);
+        // System.out.println(query);
 
         SearchTree search = new SearchTree(knowledge, query);
 
@@ -47,6 +51,7 @@ public final class Main {
                 System.out.println("No.");
         } while (frame != null);
 
+        System.out.println(search.toDOT());
         createGraphImage("searchgraph.png", search.toDOT());
     }
 

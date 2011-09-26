@@ -15,6 +15,8 @@ import fj.data.List;
  * instantiates them by internal variables (e.g. foo(_G1)).
  */
 public final class FreeVariablesInternalizer implements Visitor<Term> {
+    // TODO: Code duplication with Instantiator
+
     private final InternalVariableFactory internalVariableFactory;
     private Frame frame;
 
