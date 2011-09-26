@@ -1,7 +1,8 @@
 package jlogic.read;
 
-import java.io.Reader;
 import java.io.IOException;
+import java.io.Reader;
+import java.util.HashMap;
 
 public final class Lexer {
     private String file;
@@ -11,6 +12,18 @@ public final class Lexer {
     private Reader code;
     private char current;
     private boolean endOfFile = false;
+
+    private static final HashMap<Character, TokenType> simpleTokenTypes = new HashMap<Character, TokenType>();
+
+    static {
+        simpleTokenTypes.put('(', TokenType.LeftParen);
+        simpleTokenTypes.put(')', TokenType.RightParen);
+        simpleTokenTypes.put('_', TokenType.Underscore);
+        simpleTokenTypes.put(',', TokenType.Comma);
+        simpleTokenTypes.put(':', TokenType.Colon);
+        simpleTokenTypes.put('-', TokenType.Hyphen);
+        simpleTokenTypes.put('.', TokenType.Period);
+    }
 
     public Lexer(String file, Reader code) throws IOException {
         this.file = file;
@@ -30,38 +43,22 @@ public final class Lexer {
         if (endOfFile)
             return new Token(createLocation(), TokenType.EndOfFile, "");
 
-        Token token = null;
-        if (Character.isLetter(current)) {
-            token = readIdentifier();
-        } else if (current == '(') {
-            token = new Token(createLocation(), TokenType.LeftParen, "(");
-            advance();
-        } else if (current == ')') {
-            token = new Token(createLocation(), TokenType.RightParen, ")");
-            advance();
-        } else if (current == '_') {
-            token = new Token(createLocation(), TokenType.Underscore, ")");
-            advance();
-        } else if (current == ',') {
-            token = new Token(createLocation(), TokenType.Comma, ",");
-            advance();
-        } else if (current == ':') {
-            token = new Token(createLocation(), TokenType.Colon, ":");
-            advance();
-        } else if (current == '-') {
-            token = new Token(createLocation(), TokenType.Hyphen, "-");
-            advance();
-        } else if (current == '.') {
-            token = new Token(createLocation(), TokenType.Period, ".");
-            advance();
-        }
-
-        if (token == null)
-            throw new ReadException(createLocation(), "Unknown character: " + current);
-
         skipWhitespace();
 
-        return token;
+        while (current == '%')
+            skipComment();
+
+        if (Character.isLetter(current))
+            return readIdentifier();
+
+        TokenType type = simpleTokenTypes.get(current);
+        if (type != null) {
+            Token token = new Token(createLocation(), type, Character.toString(current));
+            advance();
+            return token;
+        }
+
+        throw new ReadException(createLocation(), "Unknown character: " + current);
     }
 
     private void advance() throws IOException {
@@ -104,5 +101,13 @@ public final class Lexer {
             else
                 advance();
         }
+    }
+
+    private void skipComment() throws IOException {
+        assert current == '%';
+        while (!endOfFile && current != '\n') {
+            advance();
+        }
+        skipWhitespace();
     }
 }
