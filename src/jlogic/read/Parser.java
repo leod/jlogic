@@ -40,7 +40,8 @@ public final class Parser {
 
                         while (current.getType() != TokenType.RightParen) {
                             if (current.getType() == TokenType.EndOfFile)
-                                throw new ReadException(current.getLocation(), "Unexpected end of file in parameter list");
+                                throw new ReadException(current.getLocation(),
+                                        "Unexpected end of file in parameter list");
 
                             arguments.add(parseTerm());
                             if (current.getType() == TokenType.Comma)
@@ -51,7 +52,8 @@ public final class Parser {
                         advance();
 
                         Term[] argumentArray = new Term[arguments.size()];
-                        return new Structure(atom, arguments.toArray(argumentArray));
+                        return new Structure(atom,
+                                arguments.toArray(argumentArray));
                     } else {
                         return atom;
                     }
@@ -90,7 +92,8 @@ public final class Parser {
 
             while (current.getType() != TokenType.Period) {
                 if (current.getType() == TokenType.EndOfFile)
-                    throw new ReadException(current.getLocation(), "Unexpected end of file in rule");
+                    throw new ReadException(current.getLocation(),
+                            "Unexpected end of file in rule");
 
                 body.add(parseTerm());
                 if (current.getType() == TokenType.Comma)
@@ -126,13 +129,17 @@ public final class Parser {
 
     private void checkAdvance(TokenType currentType) throws ReadException, IOException {
         if (current.getType() != currentType)
-            throw new ReadException(current.getLocation(), "Expected " + currentType.toString() + ", got " + current.getType().toString());
+            throw new ReadException(current.getLocation(), "Expected " +
+                    currentType.toString() + ", got " +
+                    current.getType().toString());
         advance();
     }
 
     private void advanceExpect(TokenType expectedType) throws ReadException, IOException {
         advance();
         if (current.getType() != expectedType)
-            throw new ReadException(current.getLocation(), "Expected " + expectedType.toString() + ", got " + current.getType().toString());
+            throw new ReadException(current.getLocation(), "Expected " +
+                    expectedType.toString() + ", got " +
+                    current.getType().toString());
     }
 }
