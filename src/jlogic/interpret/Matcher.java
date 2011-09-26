@@ -23,7 +23,8 @@ public final class Matcher {
      * @return Either a new frame or null, if the match was unsuccessful.
      */
     public static Frame match(Frame frame, Term a, Term b) {
-        System.out.println("Match " + a + " and " + b + " in frame " + frame);
+        // System.out.println("Match " + a + " and " + b + " in frame " +
+        // frame);
 
         if (a.equals(b))
             return frame;

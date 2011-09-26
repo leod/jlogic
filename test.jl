@@ -1,9 +1,7 @@
-child(martha,charlotte).
-child(charlotte,caroline).   
-child(caroline,laura).   
-child(laura,rose).
+numeral(zero).
+ 
+numeral(succ(X)) :- numeral(X).
 
-descend(X,Y) :- child(X,Y).
-
-descend(X,Y) :- child(X,Z),
-                descend(Z,Y).
+add(zero,Y,Y).
+add(succ(X),Y,succ(Z)) :-
+        add(X,Y,Z).

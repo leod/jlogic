@@ -13,11 +13,12 @@ import fj.data.List;
  * Interprets queries on a knowledge base using a tree. Each node in the tree
  * contains a list of goals which must be fulfilled.
  * 
- * This implementation is quite inefficient as it copies terms every time
- * they're instantiated.
+ * This implementation is quite inefficient as it copies terms every time their
+ * variables are instantiated.
  */
 public final class SearchTree {
     private final Knowledge knowledge;
+    private final InternalVariableFactory internalVariableFactory;
     private final Node root;
 
     private Node current;
@@ -25,10 +26,13 @@ public final class SearchTree {
 
     public SearchTree(Knowledge knowledge, Structure query) {
         this.knowledge = knowledge;
+        internalVariableFactory = new InternalVariableFactory();
 
-        System.out.println("Query: " + query);
+        FreeVariablesInternalizer internalizer =
+                new FreeVariablesInternalizer(internalVariableFactory, new Frame());
+        query = (Structure) internalizer.visit(query);
 
-        root = current = new Node(null, List.single((Term) query));
+        root = current = new Node(null, new Frame(), List.single((Term) query));
     }
 
     public Frame searchOne() {
@@ -74,8 +78,21 @@ public final class SearchTree {
         throw new AssertionError(term.toString());
     }
 
+    private String clausesToString(List<Term> clauses) {
+        return clauses.foldLeft(new F2<String, Term, String>() {
+            @Override
+            public String f(String accum, Term term) {
+                return accum + term.toString();
+            }
+        }, "");
+    }
+
+    static int test = 0;
+
     private final class Node {
         private final Node parent;
+
+        private final Frame frame;
 
         // List of goals that must be fulfilled
         private final List<Term> goals;
@@ -95,23 +112,25 @@ public final class SearchTree {
         // list of children there.
         private List<Node> children = List.nil();
 
-        public Node(Node parent, List<Term> goals) {
+        public Node(Node parent, Frame frame, List<Term> goals) {
             this.parent = parent;
             this.goals = goals;
+            this.frame = frame;
 
             this.goal = goals.isEmpty() ? null : goals.head();
             this.goalPredicate = goal != null ? getPredicate(this.goal) : null;
             this.numClauses = this.goalPredicate != null ? this.goalPredicate.getClauses().length : 0;
 
-            System.out.println("New Node with clauses " + goals.foldLeft(new F2<String, Term, String>() {
-                @Override
-                public String f(String accum, Term term) {
-                    return accum + term.toString();
-                }
-            }, ""));
+            System.out.println("New Node with clauses " + clausesToString(goals) + " and frame " + frame);
         }
 
         public void searchOne() {
+            if (++test == 20) {
+                current = null;
+                result = null;
+                return;
+            }
+
             if (goals.isEmpty()) {
                 System.out.println("Reached empty node");
 
@@ -130,36 +149,59 @@ public final class SearchTree {
                 return;
             }
 
-            Frame frame;
+            Frame matchFrame;
             do {
                 Rule clause = this.goalPredicate.getClauses()[currentClause];
                 ++currentClause;
 
-                frame = Matcher.match(new Frame(), goal, clause.getHead());
+                // Replace all free variables in the clause's arguments by
+                // internal variables before matching
+                Frame augmentedFrame = new Frame(frame);
+                FreeVariablesInternalizer internalizer =
+                        new FreeVariablesInternalizer(internalVariableFactory,
+                                augmentedFrame);
+                Instantiator instantiator = new Instantiator(augmentedFrame);
+                List<Term> clauseBody = getTerms(clause);
+                System.out.println("Before: " + clause.getHead() + " :- " + clausesToString(clauseBody));
+                Term clauseHead = clause.getHead().accept(internalizer);
+                clauseBody = instantiator.visit(clauseBody);
+                System.out.println("After: " + clauseHead + " :- " + clausesToString(clauseBody));
+
+                System.out.println("Matching: " + goal + " vs. " + clauseHead + " with " + frame);
+                matchFrame = Matcher.match(frame, goal, clauseHead);
 
                 // Create a new child with the first clause in our predicate
                 // that matches
-                if (frame != null) {
-                    System.out.println("Matched in " + frame);
-                    Instantiator instantiator = new Instantiator(frame);
-                    List<Term> body = instantiator.visit(getTerms(clause));
+                if (matchFrame != null) {
+                    matchFrame = new Frame(matchFrame);
+                    System.out.println("Matched in " + matchFrame);
 
-                    Node childNode = new Node(this, goals.tail().append(body));
+                    // Instantiate the clause's body with known variables,
+                    // then replace all remaining free variables by internal
+                    // variables
+                    instantiator = new Instantiator(matchFrame);
+                    internalizer = new FreeVariablesInternalizer(internalVariableFactory, new Frame(matchFrame));
+
+                    clauseBody = internalizer.visit(clauseBody);
+
+                    List<Term> childGoals = goals.tail().append(clauseBody);
+                    childGoals = instantiator.visit(childGoals);
+
+                    Node childNode = new Node(this, matchFrame, childGoals);
                     children = children.cons(childNode);
 
                     // Give control to our new child
                     current = childNode;
                     return;
                 }
-            } while (frame == null && currentClause != numClauses);
+            } while (matchFrame == null && currentClause != numClauses);
 
             // No matching clause was found. Backtrack to our parent.
             current = parent;
         }
 
         public int toDOT(StringBuilder builder) {
-            int thisId = idCounter;
-            idCounter += 1;
+            int thisId = idCounter++;
 
             builder.append("\tN");
             builder.append(thisId);
@@ -172,6 +214,8 @@ public final class SearchTree {
 
             if (!goals.isEmpty()) // Remove last comma and newline if existing
                 builder.delete(builder.length() - 3, builder.length());
+            else
+                builder.append(frame);
 
             builder.append("\"];\n");
 

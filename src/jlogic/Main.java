@@ -27,7 +27,7 @@ public final class Main {
         // System.out.println(Matcher.match(frame, left, right));
 
         Knowledge knowledge = readFile("test.jl");
-        Structure query = (Structure) termFromString("descend(martha,laura)");
+        Structure query = (Structure) termFromString("add(succ(succ(succ(zero))), succ(succ(zero)), R)");
 
         System.out.println(knowledge);
         System.out.println(query);
