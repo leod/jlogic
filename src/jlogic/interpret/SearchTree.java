@@ -5,6 +5,7 @@ import jlogic.Predicate;
 import jlogic.Rule;
 import jlogic.term.Structure;
 import jlogic.term.Term;
+
 import fj.F2;
 import fj.data.List;
 
@@ -75,13 +76,22 @@ public final class SearchTree {
     private final class Node {
         private final Node parent;
 
+        // List of goals that must be fulfilled
         private final List<Term> goals;
 
+        // Null if goals is empty, head of goals otherwise
         private final Term goal;
+
+        // Null if goals is empty or there is no predicate of the name that
+        // goal requires
         private final Predicate goalPredicate;
         private final int numClauses;
         private int currentClause = 0;
 
+        // The children list is only used to create pretty graphs using toDOT.
+        // Since the actual evaluation is depth-first, control is always
+        // immediately given to newly created children. Hence, we don't need a
+        // list of children there.
         private List<Node> children = List.nil();
 
         public Node(Node parent, List<Term> goals) {
@@ -104,36 +114,46 @@ public final class SearchTree {
             if (goals.isEmpty()) {
                 System.out.println("Reached empty node");
 
-                current = parent; // Give control to our parent
+                // An empty goal list means that we have found a valid result.
+                // Hand control to our parent and return our frame of variable
+                // instantiations.
+                current = parent;
                 result = new Frame(); // TODO: Hack
                 return;
             }
 
             if (currentClause == numClauses || goalPredicate == null) {
-                System.out.println("Backtracking");
-
-                // Backtrack to parent
+                // All clauses in our predicate were tried already, or our
+                // predicate does not exist: backtrack to parent.
                 current = parent;
                 return;
             }
 
-            Rule clause = this.goalPredicate.getClauses()[currentClause];
-            ++currentClause;
+            Frame frame;
+            do {
+                Rule clause = this.goalPredicate.getClauses()[currentClause];
+                ++currentClause;
 
-            Frame frame = Matcher.match(new Frame(), goal, clause.getHead());
+                frame = Matcher.match(new Frame(), goal, clause.getHead());
 
-            if (frame != null) {
-                System.out.println("Matched in " + frame);
-                Instantiator instantiator = new Instantiator(frame);
-                List<Term> body = instantiator.visit(getTerms(clause));
+                // Create a new child with the first clause in our predicate
+                // that matches
+                if (frame != null) {
+                    System.out.println("Matched in " + frame);
+                    Instantiator instantiator = new Instantiator(frame);
+                    List<Term> body = instantiator.visit(getTerms(clause));
 
-                Node childNode = new Node(this, goals.tail().append(body));
-                children = children.cons(childNode);
+                    Node childNode = new Node(this, goals.tail().append(body));
+                    children = children.cons(childNode);
 
-                // Give control to our new child
-                current = childNode;
-                return;
-            }
+                    // Give control to our new child
+                    current = childNode;
+                    return;
+                }
+            } while (frame == null && currentClause != numClauses);
+
+            // No matching clause was found. Backtrack to our parent.
+            current = parent;
         }
 
         public int toDOT(StringBuilder builder) {
