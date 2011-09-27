@@ -43,7 +43,7 @@ public final class REPL {
             SearchTree searchTree = new SearchTree(knowledge, goal);
 
             Frame frame;
-            char inputChar;
+            String line;
             do {
                 frame = searchTree.searchOne();
                 if (frame != null) {
@@ -53,7 +53,6 @@ public final class REPL {
                             output.write(" = ");
                             output.write(entry.getValue().toString());
                             output.write("\n");
-                            output.write("\n");
                         }
                     } else
                         output.write("Yes.\n");
@@ -62,8 +61,16 @@ public final class REPL {
                     output.write("No.\n");
                 output.flush();
 
-                // inputChar = (char) input.read();
-            } while (/* inputChar == ';' && */frame != null);
+                if (frame == null)
+                    break; // That was the last solution
+
+                output.write("More? [y]/n: ");
+                output.flush();
+                line = input.readLine().trim();
+
+                output.write("\n");
+            } while (line.equals("") || line.equals("Y") || line.equals("y")
+                    || line.equals("yes") || line.equals(";"));
 
             output.write("\n");
             output.flush();
@@ -83,7 +90,7 @@ public final class REPL {
 
             if (line.startsWith(":")) {
                 String command = line.substring(1);
-                if (command == "quit")
+                if (command.equals("quit"))
                     return null;
             }
 
