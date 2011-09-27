@@ -62,7 +62,7 @@ public final class DOT {
     private List<Map.Entry<Variable, Term>> filterFrameDelta(SearchNode node, List<Map.Entry<Variable, Term>> delta) {
         assert node != null;
 
-        final SearchNode parent = node;
+        final SearchNode parent = node.getParent();
         assert parent != null;
 
         return delta.filter(new F<Map.Entry<Variable, Term>, Boolean>() {
