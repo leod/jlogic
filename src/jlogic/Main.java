@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
 
+import jlogic.interpret.DOT;
 import jlogic.interpret.Frame;
 import jlogic.interpret.SearchTree;
 import jlogic.read.Lexer;
@@ -57,7 +58,8 @@ public final class Main {
         } while (frame != null);
 
         // System.out.println(search.toDOT());
-        createGraphImage("searchgraph.png", search.toDOT());
+        DOT dot = new DOT(search);
+        createGraphImage("searchgraph.png", dot.generateDOT());
     }
 
     private static Term termFromString(String string) throws ReadException, IOException {
