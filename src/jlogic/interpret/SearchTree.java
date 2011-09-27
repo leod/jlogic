@@ -17,7 +17,6 @@ import fj.data.List;
  * variables are instantiated.
  */
 public final class SearchTree {
-    private final Knowledge knowledge;
     private final InternalVariableFactory internalVariableFactory;
 
     private final SearchNode root;
@@ -30,7 +29,6 @@ public final class SearchTree {
     private SearchNode current;
 
     public SearchTree(Knowledge knowledge, Structure query) {
-        this.knowledge = knowledge;
         internalVariableFactory = new InternalVariableFactory();
 
         // To prevent conflicts, first replace all free variables in the query
